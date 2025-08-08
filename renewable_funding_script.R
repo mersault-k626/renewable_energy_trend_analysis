@@ -110,17 +110,16 @@ invisible(lapply(required_pkgs, library, character.only = TRUE))
 
 # --- Define path to data -----------------------------
 
-wb_path         <- here("data", "ri_sheets.xlsx")
-continents_path <- here("data", "country-continent-codes.csv")
+wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/ri_sheets.xlsx"
 
+wb_temp <- tempfile(fileext = ".xlsx")
+download.file(wb_url, wb_temp, mode = "wb")
 
 # ---- Read raw Excel sheets ----
 
-ire_grid <- read_excel(wb_path, sheet = 1)
-ire_fin  <- read_excel(wb_path, sheet = 2)
-wb_dev   <- read_excel(wb_path, sheet = 3)
-
-
+ire_grid <- read_excel(wb_temp, sheet = 1)
+ire_fin  <- read_excel(wb_temp, sheet = 2)
+wb_dev   <- read_excel(wb_temp, sheet = 3)
 
 
 # --- New columns for ISO3C with custom matches -------
@@ -404,12 +403,15 @@ renewable_inv_cleaned %>%
 
 # ---WEI ----------------------------------------------
 
+wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
 
-sheet_names <- excel_sheets("data/wei.xlsx")
+wei_temp <- tempfile(fileext = ".xlsx")
+download.file(wei_path, wei_temp, mode = "wb")
+
 
 for (sheet in sheet_names) {
   var_name <- make.names(sheet)
-  assign(var_name, read_excel("data/wei.xlsx", sheet = sheet))
+  assign(var_name, read_excel(wei_temp, sheet = sheet))
 }
 
 wei_region_investment <- rbind(africa, asia_pacific, china, eurasia, europe, middle_east, north_america, world)

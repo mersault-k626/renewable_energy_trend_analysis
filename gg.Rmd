@@ -3,10 +3,10 @@ title: "Global Clean Energy Investment Dynamics: Market Leadership Patterns and 
 author: "Asrul Nizam"
 date: "2025-08-07"
 output:
-  pdf_document:
-    latex_engine: xelatex
   html_document:
     df_print: paged
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ------------------------------------------------------------------------
@@ -40,18 +40,29 @@ library(lsr)
 library(scales)
 ```
 
-```{r wei, warning=FALSE, include=FALSE}
-sheet_names <- excel_sheets("data/wei.xlsx")
+```{r wei plus renewable_inv datasets, warning=FALSE, include=FALSE}
+wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
+
+wei_temp <- tempfile(fileext = ".xlsx")
+download.file(wei_path, wei_temp, mode = "wb")
+
+sheet_names <- excel_sheets(wei_temp)
 
 for (sheet in sheet_names) {
   var_name <- make.names(sheet)
-  assign(var_name, read_excel("data/wei.xlsx", sheet = sheet))
+  assign(var_name, read_excel(wei_temp, sheet = sheet))
 }
 
 wei_region_investment <- rbind(africa, asia_pacific, china, eurasia, europe, middle_east, north_america, world)
 
-renewable_inv <- read_csv("data/renewable_inv.csv")
-renewable_inv_cleaned <- read_csv("data/renewable_inv_cleaned.csv")
+#####
+
+renew_inv_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/renewable_inv_cleaned.csv"
+
+renew_temp <- tempfile(fileext = ".csv")
+download.file(renew_inv_path, renew_temp, mode = "wb")
+
+renewable_inv_cleaned <- read_csv(renew_temp)
 ```
 
 ------------------------------------------------------------------------
