@@ -1,8 +1,10 @@
 ---
-title: "Global Clean Energy Investment Dynamics: Market Leadership Patterns and Strategic Growth Opportunities"
+title: 'Global Clean Energy Investment Dynamics: Market Leadership Patterns and Strategic
+  Growth Opportunities'
 author: "Asrul Nizam"
 date: "2025-08-07"
 output:
+  word_document: default
   html_document:
     df_print: paged
   pdf_document:
