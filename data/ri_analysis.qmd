@@ -1,0 +1,47 @@
+---
+title: "An Analytical Report on Renewable Energy Sector Investments"
+author: "Asrul Nizam"
+format:
+  html: default
+  pdf: default
+---
+
+```{r}
+#| echo: true
+library(readr)
+library(readxl)
+library(tidyverse)
+library(ggthemes)
+library(lsr)
+```
+
+```{r}
+wei_world <- read_excel("wei.xlsx", sheet = 11)
+wei_world <- janitor::clean_names(wei_tidy)
+
+  wei_world <- wei_world %>%
+  pivot_longer(
+    cols = starts_with("20"),      
+    names_to = "year",
+    values_to = "value"
+  ) %>%
+    pivot_wider(
+    names_from = World,
+    values_from = value
+  )
+  
+  ggplot(wei_world, aes(x = year, y = total_clean_energy_usd_billion_2024_mer)) +
+  geom_line(size = 1.2, colour = "#1b9e77") +
+  ggtitle("Total Investment in Clean Energy (2015–2025)") +
+  ylab("USD billions (2024 prices)") +
+  xlab("Year") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+  ```
+
+```
