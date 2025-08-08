@@ -1,0 +1,434 @@
+---
+title: "Global Clean Energy Investment Dynamics: Market Leadership Patterns and Strategic Growth Opportunities"
+author: "Asrul Nizam"
+date: "2025-08-07"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+------------------------------------------------------------------------
+
+## 1. Introduction
+
+This report analyses global and regional trends in renewable energy investment and innovation, focusing on the distribution of funding across countries and sectors (solar, wind, hydro, etc.) from 2015 to 2024. The objective is to identify which countries and technologies are leading the transition to clean energy, how investments have evolved over time, and where future opportunities or gaps exist. The findings are based on the latest open-source datasets and aim to provide actionable insights for policymakers, investors, and stakeholders in the energy transition.
+
+------------------------------------------------------------------------
+
+## 2. Data Sources and Methodology
+
+### **Data Sources**
+
+Four open-access data sources were utilised to provide a comprehensive overview:
+
+-   **International Energy Agency (IEA)** — [World Energy Investment 2025 Datafile](https://www.iea.org/data-and-statistics/data-product/world-energy-investment-2025-datafile): Annual data on energy investment trends by region and technology.
+
+-   **World Bank** — [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators): National indicators for energy investment, clean energy policy, and development outcomes.
+
+-   **International Renewable Energy Agency (IRENA)** — [IRENASTAT](https://pxweb.irena.org/pxweb/en/IRENASTAT): Country-level statistics on renewable energy capacity, generation, and technology breakdowns.
+
+-   **United Nations Data Portal** — [UN Data Explorer](http://data.un.org/Explorer.aspx): Supplementary country and economic indicators.
+
+```{r setup, include=FALSE}
+
+library(readxl)
+library(tidyverse)
+library(ggthemes)
+library(lsr)
+library(scales)
+```
+
+```{r wei plus renewable_inv datasets, warning=FALSE, include=FALSE}
+wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
+
+wei_temp <- tempfile(fileext = ".xlsx")
+download.file(wei_path, wei_temp, mode = "wb")
+
+sheet_names <- excel_sheets(wei_temp)
+
+for (sheet in sheet_names) {
+  var_name <- make.names(sheet)
+  assign(var_name, read_excel(wei_temp, sheet = sheet))
+}
+
+wei_region_investment <- rbind(africa, asia_pacific, china, eurasia, europe, middle_east, north_america, world)
+
+#####
+
+renew_inv_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/renewable_inv_cleaned.csv"
+
+renew_temp <- tempfile(fileext = ".csv")
+download.file(renew_inv_path, renew_temp, mode = "wb")
+
+renewable_inv_cleaned <- read_csv(renew_temp)
+```
+
+------------------------------------------------------------------------
+
+## 3. Exploratory Data Analysis (EDA)
+
+### **3.1 Regional Investment Analysis**
+
+```{r pressure, echo=FALSE, warning=FALSE, fig.width=8, fig.height=10}
+region_labels <- c(
+  africa = "Africa",
+  asia_pacific = "Asia-Pacific",
+  china = "China",
+  eurasia = "Eurasia",
+  europe = "Europe",
+  middle_east = "Middle East",
+  north_america = "North America",
+  world = "Global"
+)
+
+
+ggplot(wei_region_investment, aes(x = as.numeric(year), y = total_clean_energy_usd_billion_2024_mer, colour = location)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = c(2015, 2017, 2019, 2021, 2023, 2025),
+                     labels = c("2015", "2017", "2019", "2021", "2023", "2025")
+) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), 
+                     limits = c(0, NA)) +
+  labs(x = "Year",
+       y = "Clean Energy Investment (Billion USD, 2024 MER)",
+       colour = "Region"
+  ) +
+  facet_wrap(~location, scales = "free_y", 
+             labeller = as_labeller(region_labels), 
+             ncol = 2) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(),
+        axis.ticks = element_line(),
+        legend.position = "none"
+  )
+
+```
+
+-   **China**'s renewable energy expansion, accelerated during the post-pandemic recovery, is expected to maintain momentum as the nation positions clean energy technologies as central to its net-zero transition strategy. Despite coal's continued dominance in the electricity mix, China's strategic shift toward sophisticated hybrid renewable installations and 24/7 clean energy projects will be critical for meeting anticipated power demand growth, which is forecasted to align with the country's projected 4.3% GDP expansion[\*](https://www.fitchratings.com/research/infrastructure-project-finance/apac-power-renewable-projects-outlook-2025-06-12-2024).
+
+-   **Africa** and **the Middle East** invest far less in absolute terms, yet both regions show a noticeable upward trajectory from 2020 onward, especially Africa.
+
+-   In **North America**, the increase in clean energy investment was largely by major **US** policy initiatives. The 2021 Infrastructure Investment and Jobs Act committed approximately USD 550bn toward modernising infrastructure and advancing clean energy development, while the 2022 Inflation Reduction Act, allocated another USD 370bn to support energy transition efforts and strengthen climate resilience[\*](https://www.iea.org/reports/world-energy-investment-2024/united-states).
+
+-   **Asia-Pacific** saw stagnant investment until 2021, followed by a strong surge — reflecting post-COVID economic stimulus packages and regional infrastructure ramp-ups in renewables.
+
+-   **Europe** shows strong, consistent growth — a result of multiple reinforcing forces:
+
+    -   Russia's invasion of Ukraine exposed Europe's critical vulnerability to energy supply disruptions, accelerating policy initiatives toward energy independence and renewable alternatives.
+
+    -   Record wind energy investments in 2023 (EUR 30bn)[\*](https://www.reuters.com/sustainability/climate-energy/record-year-wind-farms-raises-hope-eu-green-energy-goals-2024-02-27/).
+
+    -   Massive EU industrial policy support (e.g., NZIA, RePower, EU's target "to achieve a minimum of 42.5% of its energy consumption from renewable sources by 2030[\*](https://commission.europa.eu/document/download/97e481fd-2dc3-412d-be4c-f152a8232961_en?filename=The%20future%20of%20European%20competitiveness%20_%20A%20competitiveness%20strategy%20for%20Europe.pdf).)
+
+-   The global total mirrors the macro trends of its largest contributors, with a clear inflection point in 2021, reflecting collective global shifts toward clean energy in response to energy crises, net-zero targets, and green stimulus policies.
+
+### 3.2 Top funded renewable energy sector (2015-2025, global and region)
+
+```{r , echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=10}
+sector_cols <- c(
+  "power_generation_renewables_solar_usd_billion_2024_mer",
+  "power_generation_renewables_wind_usd_billion_2024_mer",
+  "power_generation_renewables_other_usd_billion_2024_mer"
+)
+
+top_sectors_by_region <- wei_region_investment %>%
+  # Summarise sectoral investment per region and year
+  mutate(year = as.integer(year)) %>%
+  select(location, year,
+         solar = power_generation_renewables_solar_usd_billion_2024_mer,
+         wind  = power_generation_renewables_wind_usd_billion_2024_mer,
+         hydro = power_generation_renewables_other_usd_billion_2024_mer) %>%
+  pivot_longer(cols = c(solar, wind, hydro), names_to = "sector", values_to = "investment_billion_usd") %>%
+  filter(!is.na(investment_billion_usd))
+
+# 3. Plot the trend for each sector over time
+print(ggplot(top_sectors_by_region, aes(x = year, y = investment_billion_usd, color = sector)) +
+  geom_line(size = 1.1) +
+  geom_point(size = 1.8) +
+  labs(title = "Clean Energy Investment by Sector and Region (2015–2025)",
+       x = "Year",
+       y = "Investment (bn USD, 2024 MER)",
+       color = "Sector"
+  ) +
+  scale_x_continuous(
+  breaks = c(2015, 2017, 2019, 2021, 2023, 2025),
+  labels = c("2015", "2017", "2019", "2021", "2023", "2025")
+) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), limits = c(0, NA), labels = label_number(scale_cut = cut_si("bn"))) +
+  facet_wrap(~ location, 
+             scales = "free_y",
+             labeller = as_labeller(region_labels),
+             ncol = 2) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(),
+    axis.ticks = element_line()
+  )
+)
+```
+
+-   Solar energy investment has surged across all major regions since 2020, establishing itself as the primary destination for new clean energy funding worldwide (Fitch Ratings, 2024).
+
+-   Wind energy continues to secure substantial investment, especially in **Europe** and **China**, but now trails solar in overall new funding (Reuters, 2024; European Commission, 2024).
+
+-   Hydropower investment is largely stagnant or declining, with minor growth observed only in select regions such as **Africa** and **Eurasia**.
+
+-   **Africa, the Middle East,** and **Asia-Pacific** have experienced the sharpest increases in solar investment since 2020, reflecting the impact of development finance and targeted stimulus initiatives, through programmes such as **Africa Renewable Energy Fund (AREF)**[\*](https://www.eib.org/en/products/equity/funds/africa-renewable-energy-fund) and **Africa Renewable Energy Manufacturing Initiative (Africa REMI)**[\*](https://www.seforall.org/programmes/un-energy/green-industrialization-hub/aremi).
+
+### **3.3 Top 10 countries by total renewable energy investment** (2019–2024)
+
+```{r , echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=10}
+library(tidyverse)
+library(scales)
+
+top10 <- renewable_inv_cleaned %>%
+  group_by(country, country_code, continent) %>%
+  summarise(total_renew_investment_usd = sum(total_financing_renewables_USD, na.rm = TRUE)) %>%
+  ungroup() %>%  # <--- Remove groups!
+  arrange(desc(total_renew_investment_usd)) %>%
+  slice(1:10)
+
+ggplot(top10, aes(x = reorder(country, total_renew_investment_usd), 
+                  y = total_renew_investment_usd, fill = continent)) +
+  geom_col(show.legend = TRUE) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Countries by Total Renewable Energy Investment (2019–2024)",
+    x = "Country",
+    y = "Total Investment (Million USD)",
+    fill = "Continent"
+  ) +
+  scale_y_continuous(labels = label_number(suffix = "mn", accuracy = 1)) +
+  theme_minimal()
+
+```
+
+-   The chart ranks the top 10 countries in renewable energy investment between 2019 and 2024, measured in million USD. Several insights stand out:
+
+    -   **Brazil** leads globally, supported by a robust pipeline of wind and solar projects, although recent transmission bottlenecks have started to constrain grid integration[\*](https://www.bnamericas.com/en/news/brazil-grid-operator-sets-cap-on-renewable-energy-injections).
+
+    -   **India** follows closely, underpinned by its 2030 target of 500 GW non-fossil capacity and sustained annual additions across solar and wind[\*](https://www.pib.gov.in/PressReleaseIframePage.aspx?PRID=2094992).
+
+    -   **Spain** and **France** maintain strong European positions, reflecting the EU’s record wind investment year in 2023 and the binding target to source at least 42.5% of energy from renewables by 2030.
+
+    -   **Pakistan** and **Uzbekistan** emerge as notable entrants, driven by rapid solar deployment and strong engagement from public–private partnerships and development finance institutions[\*](https://www.ifc.org/en/pressroom/2024/uzbekistan-to-build-new-solar-plant-and-first-battery-energy-storage-system-with-world-bank-group-support).
+
+    -   **Nigeria, Egypt,** and **Morocco** dominate African rankings, leveraging DFI-backed programmes, large-scale CSP/solar initiatives, and cross-border energy trade[\*](https://www.afdb.org/en/news-and-events/african-development-banks-desert-power-initiative-71072) [\*](https://afdb.africa-newsroom.com/press/egypt-african-development-bank-to-provide-1841-million-for-africas-largest-solar-energy-and-battery-storage-project?lang=en) [\*](https://africa-energy-portal.org/news/morocco-emerges-solar-power-leader-draws-major-gulf-investments).
+
+    -   **Poland’s presence** reflects its ongoing pivot away from coal, underpinned by EU structural funding, offshore wind commitments, and supportive regulatory reforms. In June 2025, renewables supplied 44.1% of electricity versus 43.7% from coal and lignite — the first month on record in which renewables outproduced coal, according to the Energy Forum. The second quarter of 2025 also marked a historic shift, with coal’s share falling to 45.2%, the first time it accounted for less than half of quarterly generation
+
+### 3.4 Leaders in renewable energy capacity
+
+```{r , echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=10}
+cap_top10 <- renewable_inv_cleaned %>%
+  group_by(country, country_code, continent) %>%
+  summarise(total_renewable_cap_mw = sum(total_renewable_cap_mw, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(total_renewable_cap_mw)) %>%
+  slice(1:10)
+
+# Plot
+ggplot(cap_top10,
+       aes(x = reorder(country, total_renewable_cap_mw),
+           y = total_renewable_cap_mw,
+           fill = continent)) +
+  geom_col(width = 0.8, show.legend = TRUE) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Countries by Installed Renewable Capacity (2019–2024)",
+    x = NULL,
+    y = "Installed Renewable Capacity (MW)",
+    fill = "Continent"
+  ) +
+  scale_y_continuous(labels = label_number(big.mark = ","), expand = c(0,0), limits = c(0, NA)) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+-   **China** leads globally in installed renewable capacity, installing 357 GW of new wind and solar in 2024 alone—a jump that fulfilled its 2030 target six years early[\*](https://apnews.com/article/climate-change-renewable-energy-solar-wind-electricity-6d570ec401b6762453ec3af0ce973694).
+
+-   Together, **China, Europe, India,** and **the US** account for around 80% of total global renewable capacity, emphasizing their dominant role in the transition.
+
+-   **Brazil** consolidated its ranking thanks to the country's deep-rooted hydropower network and surging solar/wind expansion; in 2024 alone, the country added an unprecedented 10.9 GW in new capacity, with 91% from renewables.
+
+-   **India, Germany, Spain, France, Italy, Japan,** and **Canada** remain among the top capacity holders in developed regions, driven by sustained policy commitments and utility-scale deployment.
+
+------------------------------------------------------------------------
+
+## 4. Business Insights & Strategic Recommendations
+
+### 4.1 Market patterns
+
+**4.1.1 Technology leaders by scale and innovation**
+
+**China: Manufacturing and Deployment Dominance**
+
+-   Achieved 2030 renewable capacity target six years early (357 GW added in 2024)
+
+-   Strategic focus on 24/7 clean energy projects and grid-scale storage integration
+
+-   Market opportunity: Technology export and project development expertise globally
+
+-   Key challenge: Balancing domestic capacity with international market expansion
+
+**Brazil: Resource Abundance Meeting Infrastructure Constraints**
+
+-   Global leader in renewable investment with 91% of new 2024 capacity from renewables
+
+-   Competitive advantage: Established hydropower backbone providing grid stability
+
+-   Critical bottleneck: Transmission infrastructure limiting solar/wind integration
+
+-   Investment priority: Grid modernization representing USD 15-20bn opportunity
+
+**India: Policy-Driven Rapid Scaling**
+
+-   On trajectory for 500 GW non-fossil capacity by 2030
+
+-   Strength: Consistent policy framework driving utility-scale deployment
+
+-   Emerging challenge: Land acquisition and grid integration at scale
+
+-   Market signal: Strong domestic demand creating opportunities for international partnerships
+
+**4.1.2 Regional investment patterns and opportunities**
+
+**Europe: Policy-Driven Transition Acceleration**
+
+-   Record EUR 30bn wind investment in 2023, driven by energy security concerns
+
+-   Poland's historic milestone: Renewables exceeded coal generation in Q2 2025
+
+-   Strategic advantage: Established regulatory frameworks and financing mechanisms
+
+-   Replication potential: EU structural funding models applicable to other coal-dependent regions
+
+**Emerging Markets: Development Finance as Catalyst**
+
+-   Pakistan and Uzbekistan demonstrate rapid solar deployment through PPPs
+
+-   Africa (Nigeria, Egypt, Morocco): CSP and cross-border trade creating regional hubs
+
+-   Success factor: Strategic use of DFI funding to de-risk private investment
+
+-   Scale opportunity: Proven models ready for replication across similar economies
+
+### 4.2 Strategic recommendations for renewable energy stakeholders
+
+**4.2.1 Infrastructure Development Priorities**
+
+-   **Grid Modernization and Integration**
+
+    -   The analysis reveals critical transmission bottlenecks constraining renewable capacity utilization, particularly in high-investment markets like Brazil and India.
+
+    -   Stakeholders should prioritize grid infrastructure development as a foundational requirement for renewable energy scaling.
+
+    -   Countries demonstrating renewable leadership consistently show strong grid planning integration, suggesting that transmission investment should precede or accompany generation capacity additions.
+
+-   **Energy Storage System Deployment**
+
+    -   Markets with high renewable penetration increasingly require storage solutions to maintain grid stability and maximize asset utilization.
+
+    -   The data indicates that regions combining renewable generation with storage infrastructure achieve superior capacity factors and reduced curtailment rates.
+
+    -   Strategic focus should shift toward integrated renewable-storage projects rather than standalone generation facilities.
+
+-   **Cross-Border Energy Cooperation**
+
+    -   Regional patterns show that countries with strong cross-border energy trading frameworks achieve better renewable investment outcomes. Africa's emerging renewable hubs (Nigeria, Morocco, Egypt) demonstrate how regional cooperation can amplify individual country efforts, creating economies of scale and risk diversification opportunities.
+
+**4.2.2 Technology and Market Evolution**
+
+-   **Hybrid Renewable Project Development**
+
+    -   The transition toward hybrid solar-wind-storage installations represents the next evolution in renewable project development. Markets like Morocco and China leading this approach achieve higher capacity factors and provide more reliable energy supply. Stakeholders should evaluate hybrid configurations as the emerging standard for new renewable developments.
+
+-   **24/7 Clean Energy Solutions**
+
+    -   Beyond traditional renewable capacity additions, the market is evolving toward continuous clean energy supply models. This shift requires integration of multiple technologies, storage systems, and demand management solutions. Early adoption of 24/7 clean energy approaches positions stakeholders advantageously as corporate and industrial demand increasingly focuses on round-the-clock renewable supply.
+
+-   **Manufacturing and Supply Chain Localization**
+
+    -   Countries demonstrating sustained renewable growth consistently develop local manufacturing capabilities and supply chains. India's manufacturing-linked solar programs and China's integrated industrial approach provide models for building domestic renewable energy ecosystems that capture greater economic value from the energy transition.
+
+**4.2.3 Financial Architecture and Risk Management**
+
+-   **Blended Finance Mechanism Utilization:**
+
+    -    Emerging markets showing rapid renewable acceleration consistently leverage development finance institution support to de-risk private investment. The proven model of combining concessional finance with commercial capital creates opportunities for scaling renewable investment in previously challenging markets.
+
+-   **Currency and Political Risk Mitigation:**
+
+    -    Successful renewable markets demonstrate strong risk mitigation frameworks addressing currency volatility, policy changes, and regulatory uncertainty. Stakeholders should prioritize markets with established risk mitigation instruments and consider local currency revenue streams to reduce foreign exchange exposure.
+
+-   **Portfolio Diversification Strategies**
+
+    -   Geographic and technology diversification emerges as a critical success factor from the investment patterns observed. Markets leading in renewable investment typically span multiple technologies, geographic regions, and development stages, reducing concentration risk and optimizing risk-adjusted returns.
+
+**4.2.4 Policy and Regulatory Alignment**
+
+-   Regulatory Framework Harmonization
+
+    -   Countries achieving sustainable renewable growth demonstrate consistent, long-term policy frameworks that provide investor certainty. Successful markets move beyond simple feed-in tariffs toward comprehensive energy market refoms that integrate renewables into competitive market structures.
+
+-   **Auction Design and Market Mechanisms**
+
+    -   Advanced renewable markets increasingly adopt sophisticated auction mechanisms that consider system value beyond lowest cost. Integration of grid services, storage requirements, and local content considerations into procurement processes drives more sustainable market development.
+
+-   **International Standards and Certification**
+
+    -   Markets with strong renewable growth consistently adopt international standards for project development, environmental compliance, and performance measurement. Standardization facilitates cross-border investment flows and reduces transaction costs for international stakeholders.
+
+### 4.3 Risk Assessment and Mitigation Strategies
+
+**4.3.1 Technology and market risks**
+
+**Grid Integration Challenges**
+
+-   Risk: Renewable curtailment reducing project returns
+
+<!-- -->
+
+-   Mitigation: Co-invest in storage and transmission infrastructure
+
+-   Monitoring: Track grid congestion data and regulatory responses
+
+**Policy Reversal Risk**
+
+-   Risk: Political changes affecting renewable support mechanisms
+
+-   Mitigation: Diversify across multiple regulatory regimes
+
+-   Due diligence: Assess policy sustainability across electoral cycles
+
+**4.3.2 Financial and operational risks**
+
+**Currency and Commodity Exposure**
+
+-   Risk: Emerging market investments subject to FX volatility
+
+-   Mitigation: Natural hedging through local revenue streams
+
+-   Innovation: Local currency green bonds reducing currency mismatch
+
+**Technology Obsolescence**
+
+-   Risk: Rapid cost declines making existing assets uncompetitive
+
+-   Mitigation: Modular designs enabling technology upgrades (akin to the approach adopted in nuclear power)
+
+-   Strategy: Focus on sites with superior resource quality
+
+# 5. Conclusion
+
+The renewable energy sector represents a USD 4tn investment opportunity through 2030, with clear winners emerging across technology, geography, and business models. Success requires moving beyond simple capacity additions to integrated energy system solutions that address grid stability, storage, and regional cooperation.
+
+Investors who position early in transmission infrastructure, energy storage integration, and emerging market development will capture disproportionate returns as the energy transition accelerates. The data shows that policy-supported markets with strong resource endowments and established financial frameworks consistently deliver superior risk-adjusted returns.
+
+The transition is no longer a question of if, but how fast—and which investors, policymakers, and companies will lead the transformation of the global energy system.
