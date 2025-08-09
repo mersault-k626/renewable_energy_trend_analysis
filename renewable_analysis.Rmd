@@ -4,22 +4,26 @@ title: 'Global Clean Energy Investment Dynamics: Market Leadership Patterns and 
 author: "Asrul Nizam"
 date: "2025-08-07"
 output:
+  pdf_document:
+    latex_engine: xelatex
   word_document: default
   html_document:
     df_print: paged
-  pdf_document:
-    latex_engine: xelatex
 ---
 
 ------------------------------------------------------------------------
 
+
 ## 1. Introduction
+
 
 This report analyses global and regional trends in renewable energy investment and innovation, focusing on the distribution of funding across countries and sectors (solar, wind, hydro, etc.) from 2015 to 2024. The objective is to identify which countries and technologies are leading the transition to clean energy, how investments have evolved over time, and where future opportunities or gaps exist. The findings are based on the latest open-source datasets and aim to provide actionable insights for policymakers, investors, and stakeholders in the energy transition.
 
 ------------------------------------------------------------------------
 
-## 2. Data Sources and Methodology
+
+## 2. Data Sources
+
 
 ### **Data Sources**
 
@@ -71,7 +75,9 @@ renewable_inv_cleaned <- read_csv(renew_temp)
 
 ## 3. Exploratory Data Analysis (EDA)
 
+
 ### **3.1 Regional Investment Analysis**
+
 
 ```{r pressure, echo=FALSE, warning=FALSE, fig.width=8, fig.height=10}
 region_labels <- c(
@@ -176,9 +182,9 @@ print(ggplot(top_sectors_by_region, aes(x = year, y = investment_billion_usd, co
 )
 ```
 
--   Solar energy investment has surged across all major regions since 2020, establishing itself as the primary destination for new clean energy funding worldwide (Fitch Ratings, 2024).
+-   Solar energy investment has surged across all major regions since 2020, establishing itself as the primary destination for new clean energy funding worldwide.
 
--   Wind energy continues to secure substantial investment, especially in **Europe** and **China**, but now trails solar in overall new funding (Reuters, 2024; European Commission, 2024).
+-   Wind energy continues to secure substantial investment, especially in **Europe** and **China**, but now trails solar in overall new funding.
 
 -   Hydropower investment is largely stagnant or declining, with minor growth observed only in select regions such as **Africa** and **Eurasia**.
 
