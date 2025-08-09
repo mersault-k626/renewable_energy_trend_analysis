@@ -110,10 +110,12 @@ invisible(lapply(required_pkgs, library, character.only = TRUE))
 
 # --- Define path to data -----------------------------
 
-wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/renewable_inv_cleaned.csv"
+wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/raw/ri_sheets.xlsx"
 
 wb_temp <- tempfile(fileext = ".xlsx")
 download.file(wb_url, wb_temp, mode = "wb")
+
+continents_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/country-continent-codes.csv"
 
 # ---- Read raw Excel sheets ----
 
@@ -407,6 +409,8 @@ wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/ra
 
 wei_temp <- tempfile(fileext = ".xlsx")
 download.file(wei_path, wei_temp, mode = "wb")
+
+sheet_names <- excel_sheets(wei_temp)
 
 
 for (sheet in sheet_names) {
