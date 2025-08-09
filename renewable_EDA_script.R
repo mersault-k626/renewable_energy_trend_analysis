@@ -110,7 +110,7 @@ invisible(lapply(required_pkgs, library, character.only = TRUE))
 
 # --- Define path to data -----------------------------
 
-wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/ri_sheets.xlsx"
+wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/renewable_inv_cleaned.csv"
 
 wb_temp <- tempfile(fileext = ".xlsx")
 download.file(wb_url, wb_temp, mode = "wb")
