@@ -4,11 +4,11 @@ title: 'Global Clean Energy Investment Dynamics: Market Leadership Patterns and 
 author: "Asrul Nizam"
 date: "2025-08-07"
 output:
-  pdf_document:
-    latex_engine: xelatex
-  word_document: default
   html_document:
     df_print: paged
+  word_document: default
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ------------------------------------------------------------------------
