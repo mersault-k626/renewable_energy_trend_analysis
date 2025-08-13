@@ -63,7 +63,7 @@ wei_region_investment <- rbind(africa, asia_pacific, china, eurasia, europe, mid
 
 #####
 
-renew_inv_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/renewable_inv_cleaned.csv"
+renew_inv_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/renewable_inv_cleaned.csv"
 
 renew_temp <- tempfile(fileext = ".csv")
 download.file(renew_inv_path, renew_temp, mode = "wb")
