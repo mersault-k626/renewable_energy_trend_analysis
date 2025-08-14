@@ -407,9 +407,12 @@ renewable_inv_cleaned %>%
 
 wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
 
+
+
 wei_temp <- tempfile(fileext = ".xlsx")
 download.file(wei_path, wei_temp, mode = "wb")
 
+sheet_names <- excel_sheets(wei_temp)
 
 for (sheet in sheet_names) {
   var_name <- make.names(sheet)
