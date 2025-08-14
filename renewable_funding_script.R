@@ -115,6 +115,8 @@ wb_url <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/
 wb_temp <- tempfile(fileext = ".xlsx")
 download.file(wb_url, wb_temp, mode = "wb")
 
+continents_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/raw/country-continent-codes.csv"
+
 # ---- Read raw Excel sheets ----
 
 ire_grid <- read_excel(wb_temp, sheet = 1)
