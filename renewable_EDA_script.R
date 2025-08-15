@@ -328,8 +328,6 @@ renewable_inv_cleaned <- ri_wide %>%
     total_financing_renewables_USD
   )
 
-write_csv(renewable_inv_cleaned, file = "data/renewable_inv_cleaned.csv")
-
 
 # ---SQL export ---------------------------------------
 
