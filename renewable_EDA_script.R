@@ -35,12 +35,6 @@
 
 # 3. DATA CLEANING & PREPARATION ==============================================
 
-# Load required libraries
-library(tidyverse)
-library(readxl)
-library(countrycode)
-library(janitor)
-
 # Process Overview:
 
 # Data Import and Integration
