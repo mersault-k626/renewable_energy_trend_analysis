@@ -329,72 +329,6 @@ renewable_inv_cleaned <- ri_wide %>%
   )
 
 
-# ---SQL export ---------------------------------------
-
-
-# parameters (via env vars or defaults)
-
-host   <- Sys.getenv("PG_HOST", "localhost")
-
-port   <- Sys.getenv("PG_PORT", "5432")
-
-user   <- Sys.getenv("PG_USER", "postgres")
-
-pwd    <- Sys.getenv("PG_PWD", "123456789")
-
-dbname <- Sys.getenv("PG_DB", "renewable_funding")
-
-# Establish connection to PostgreSQL
-
-default_con <- dbConnect(Postgres(),
-                         host = host,
-                         port = port,
-                         dbname = "postgres",
-                         user = user,
-                         password = pwd
-                         )
-
-# Check if db exist; if not create one
-
-exists <- dbGetQuery(default_con, 
-                     sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", dbname)
-                     )
-if (nrow(exists) == 0) {
-  dbExecute(default_con, sprintf("CREATE DATABASE %s", dbname))
-}
-
-dbDisconnect(default_con)
-
-# Connect to db and export cleaned dataset
-
-con <- dbConnect(Postgres(),
-                 host = host,
-                 port = port,
-                 dbname = dbname,
-                 user = user,
-                 password = pwd
-)
-
-if (dbExistsTable(con, "renewable_investment")) {
-  dbExecute(con, "DROP TABLE renewable_investment")
-}
-
-dbWriteTable(conn = con,
-             name = "renewable_investment",
-             value = renewable_inv_cleaned,
-             overwrite = TRUE,
-             row.names = FALSE
-             )
-
-dbDisconnect(con)
-
-# proceed to SQL for normalisation
-
-
-renewable_inv_cleaned %>%
-  filter(country_code == "ABW")
-
-
 # ---WEI ----------------------------------------------
 
 wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
@@ -446,6 +380,71 @@ ggplot(wei_region_investment, aes(x = as.numeric(year), y = total_clean_energy_u
     axis.ticks = element_line(),
     legend.position = "none"
   )
+
+# ---SQL export ---------------------------------------
+
+
+# parameters (via env vars or defaults)
+
+host   <- Sys.getenv("PG_HOST", "localhost")
+
+port   <- Sys.getenv("PG_PORT", "5432")
+
+user   <- Sys.getenv("PG_USER", "postgres")
+
+pwd    <- Sys.getenv("PG_PWD", "123456789")
+
+dbname <- Sys.getenv("PG_DB", "renewable_funding")
+
+# Establish connection to PostgreSQL
+
+default_con <- dbConnect(Postgres(),
+                         host = host,
+                         port = port,
+                         dbname = "postgres",
+                         user = user,
+                         password = pwd
+)
+
+# Check if db exist; if not create one
+
+exists <- dbGetQuery(default_con, 
+                     sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", dbname)
+)
+if (nrow(exists) == 0) {
+  dbExecute(default_con, sprintf("CREATE DATABASE %s", dbname))
+}
+
+dbDisconnect(default_con)
+
+# Connect to db and export cleaned dataset
+
+con <- dbConnect(Postgres(),
+                 host = host,
+                 port = port,
+                 dbname = dbname,
+                 user = user,
+                 password = pwd
+)
+
+if (dbExistsTable(con, "renewable_investment")) {
+  dbExecute(con, "DROP TABLE renewable_investment")
+}
+
+dbWriteTable(conn = con,
+             name = "renewable_investment",
+             value = renewable_inv_cleaned,
+             overwrite = TRUE,
+             row.names = FALSE
+)
+
+dbDisconnect(con)
+
+# proceed to SQL for normalisation
+
+
+renewable_inv_cleaned %>%
+  filter(country_code == "ABW")
 
 
 
