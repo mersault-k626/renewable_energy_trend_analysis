@@ -111,6 +111,8 @@ download.file(wb_url, wb_temp, mode = "wb")
 
 continents_path <- "https://raw.githubusercontent.com/mersault-k626/renewable_energy_trend_analysis/refs/heads/main/data/country-continent-codes.csv"
 
+wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
+
 # ---- Read raw Excel sheets ----
 
 ire_grid <- read_excel(wb_temp, sheet = 1)
@@ -331,7 +333,6 @@ renewable_inv_cleaned <- ri_wide %>%
 
 # ---WEI ----------------------------------------------
 
-wei_path <- "https://github.com/mersault-k626/renewable_energy_trend_analysis/raw/refs/heads/main/data/wei.xlsx"
 
 wei_temp <- tempfile(fileext = ".xlsx")
 download.file(wei_path, wei_temp, mode = "wb")
@@ -345,6 +346,8 @@ for (sheet in sheet_names) {
 }
 
 wei_region_investment <- rbind(africa, asia_pacific, china, eurasia, europe, middle_east, north_america, world)
+
+write_csv(wei_region_investment, "data/wei_cleaned.csv")
 
 
 # analysis --------------------------------------------
